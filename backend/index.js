@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
         }
 
         rooms.get(roomId).add(userName);
-        io.to(roomId).emit('userJoined', Array.from(rooms.get(currentRoom)));
+        io.to(roomId).emit('userJoined', Array.from(rooms.get(roomId)));
     });
 
     socket.on('codeChange', ({ roomId, code }) => {
