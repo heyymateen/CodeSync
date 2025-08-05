@@ -1,28 +1,4 @@
 
-```
-REALTIME-COLLABORATIVE-CODE-EDITOR
-├─ backend
-│  └─ index.js
-├─ frontend
-│  ├─ README.md
-│  ├─ eslint.config.js
-│  ├─ index.html
-│  ├─ package-lock.json
-│  ├─ package.json
-│  ├─ public
-│  │  └─ vite.svg
-│  ├─ src
-│  │  ├─ App.css
-│  │  ├─ App.jsx
-│  │  ├─ assets
-│  │  │  └─ react.svg
-│  │  └─ main.jsx
-│  └─ vite.config.js
-├─ package-lock.json
-└─ package.json
-
-```
-```
 REALTIME-COLLABORATIVE-CODE-EDITOR
 ├─ README.md
 ├─ backend
@@ -50,5 +26,3 @@ REALTIME-COLLABORATIVE-CODE-EDITOR
 │  └─ vite.config.js
 ├─ package-lock.json
 └─ package.json
-
-```
