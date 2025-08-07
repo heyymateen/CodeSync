@@ -3,10 +3,27 @@ import http from 'http';
 import { Server } from 'socket.io';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import axios from 'axios';
 
 const app = express();
 
 const server = http.createServer(app);
+
+const url = `https://render-hosting-se2b.onrender.com`;
+const interval = 30000;
+
+function reloadWebsite() {
+  axios
+    .get(url)
+    .then((response) => {
+      console.log("website reloded");
+    })
+    .catch((error) => {
+      console.error(`Error : ${error.message}`);
+    });
+}
+
+setInterval(reloadWebsite, interval);
 
 const io = new Server(server, {
     cors: {
@@ -63,6 +80,19 @@ io.on('connection', (socket) => {
             socket.leave(currentRoom);
             currentRoom = null;
             currentUser = null;
+        }
+    })
+
+    socket.on('compileCode', async ({ code, roomId, language, version }) => { 
+        if (rooms.has(roomId)) {
+            const room = rooms.get(roomId);
+            const response = await axios.post('https://emkc.org/api/v2/piston/execute', {
+                language,
+                version,
+                files: [{content : code}]
+            });
+            room.ouput = response.data.run.output;
+            io.to(roomId).emit('codeResponse', response.data);
         }
     })
 
