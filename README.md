@@ -8,7 +8,7 @@ REALTIME-COLLABORATIVE-CODE-EDITOR
 │  ├─ README.md
 │  ├─ dist
 │  │  ├─ assets
-│  │  │  ├─ index-D7_nNyev.js
+│  │  │  ├─ index-D5munUl-.js
 │  │  │  └─ index-DQufQhJz.css
 │  │  ├─ index.html
 │  │  └─ vite.svg

@@ -41,65 +41,100 @@ io.on('connection', (socket) => {
     let currentUser = null;
 
     socket.on('join', ({ roomId, userName }) => {
-        if(currentRoom) {
-            socket.leave(currentRoom);
-            rooms.get(currentRoom).delete(currentUser);
-            io.to(currentRoom).emit('userJoined', Array.from(rooms.get(currentRoom)));
-        }
+      if (currentRoom) {
+        socket.leave(currentRoom);
+        rooms.get(currentRoom).users.delete(currentUser);
+        io.to(currentRoom).emit(
+          "userJoined",
+          Array.from(rooms.get(currentRoom).users)
+        );
+      }
+
+      currentRoom = roomId;
+      currentUser = userName;
+
+      socket.join(roomId);
+
+      if (!rooms.has(roomId)) {
+        rooms.set(roomId, {
+          users: new Set(),
+          code: "// Write your code here...",
+          input: "", // already added
+          language: "javascript", 
+        });
+      }
+
+      rooms.get(roomId).users.add(userName);
+
+      socket.emit("codeUpdate", rooms.get(roomId).code);
+
+      socket.emit("inputUpdate", rooms.get(roomId).input);
         
-        currentRoom = roomId;
-        currentUser = userName;
+      socket.emit("languageUpdate", rooms.get(roomId).language);
 
-        socket.join(roomId);
-
-        if(!rooms.has(roomId)) {
-            rooms.set(roomId, new Set());
-        }
-
-        rooms.get(roomId).add(userName);
-        io.to(roomId).emit('userJoined', Array.from(rooms.get(currentRoom)));
+      io.to(roomId).emit("userJoined", Array.from(rooms.get(currentRoom).users));
     });
 
-    socket.on('codeChange', ({ roomId, code }) => {
-        socket.to(roomId).emit('codeUpdate', code);
-    })
+    socket.on("leaveRoom", () => {
+      if (currentRoom && currentUser) {
+        rooms.get(currentRoom).users.delete(currentUser);
+        io.to(currentRoom).emit(
+          "userJoined",
+          Array.from(rooms.get(currentRoom).users)
+        );
+
+        socket.leave(currentRoom);
+        currentRoom = null;
+        currentUser = null;
+      }
+    });
+
+    socket.on("codeChange", ({ roomId, code }) => {
+      if (rooms.has(roomId)) {
+        rooms.get(roomId).code = code; 
+      }
+      socket.to(roomId).emit("codeUpdate", code);
+    });
+
+    socket.on("inputChange", ({ roomId, input }) => {
+      if (rooms.has(roomId)) {
+        rooms.get(roomId).input = input;
+      }
+      socket.to(roomId).emit("inputUpdate", input);
+    });
+
+
 
     socket.on("typing", ({roomId, userName}) =>{
         socket.to(roomId).emit("userTyping", userName);
     });
 
-    socket.on('languageChange', ({roomId, language}) =>{
-        io.to(roomId).emit('languageUpdate', language);
+    socket.on("languageChange", ({ roomId, language }) => {
+      if (rooms.has(roomId)) {
+        rooms.get(roomId).language = language;
+      }
+      io.to(roomId).emit("languageUpdate", language);
     });
 
-    socket.on('leaveRoom', () => {
-        if(currentRoom && currentUser) {
-            rooms.get(currentRoom).delete(currentUser);
-            io.to(currentRoom).emit('userJoined', Array.from(rooms.get(currentRoom)));
 
-            socket.leave(currentRoom);
-            currentRoom = null;
-            currentUser = null;
-        }
-    })
-
-    socket.on('compileCode', async ({ code, roomId, language, version }) => { 
+    socket.on('compileCode', async ({ code, roomId, language, version, input }) => { 
         if (rooms.has(roomId)) {
             const room = rooms.get(roomId);
             const response = await axios.post('https://emkc.org/api/v2/piston/execute', {
                 language,
                 version,
-                files: [{content : code}]
+                files: [{ content: code }],
+                stdin : input
             });
-            room.ouput = response.data.run.output;
+            room.output = response.data.run.output;
             io.to(roomId).emit('codeResponse', response.data);
         }
     })
 
     socket.on('disconnect', () => {
         if(currentRoom && currentUser) {
-            rooms.get(currentRoom).delete(currentUser);
-            io.to(currentRoom).emit('userJoined', Array.from(rooms.get(currentRoom)));
+            rooms.get(currentRoom).users.delete(currentUser);
+            io.to(currentRoom).emit('userJoined', Array.from(rooms.get(currentRoom).users));
         }
         console.log('User disconnected', socket.id);
     });
