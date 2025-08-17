@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import Editor from '@monaco-editor/react';
 import {v4 as uuid} from 'uuid';
 
-const socket = io('https://realtime-collaborative-code-editor-4cud.onrender.com');
+const socket = io('https://codesync-6n4p.onrender.com');
 
 const App = () => {
   const [joined, setJoined] = useState(false);
