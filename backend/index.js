@@ -9,7 +9,7 @@ const app = express();
 
 const server = http.createServer(app);
 
-const url = `https://realtime-collaborative-code-editor-4cud.onrender.com`;
+const url = `https://codesync-6n4p.onrender.com`;
 const interval = 30000;
 
 function reloadWebsite() {
