@@ -9,7 +9,7 @@ import UserIcon from "./assets/user.svg";
 import LeaveIcon from "./assets/leave.svg";
 import CopyIcon from "./assets/copy.svg";
 
-const socket = io("http://localhost:5000");
+const socket = io("https://codesync-6n4p.onrender.com");
 
 const App = () => {
   const [joined, setJoined] = useState(false);
